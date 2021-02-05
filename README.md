@@ -43,5 +43,4 @@ and is never in any way made visible to others.
 ## Known Issues
 
 - The script is slow due to interactions with the Notion API server.
-- Photos and videos are not handled correctly.
 

@@ -10,13 +10,45 @@ from pathlib import Path
 from datetime import datetime, timezone
 from notion.client import NotionClient
 
-from notion.block import CollectionViewPageBlock
+from notion.block import CollectionViewPageBlock, ImageBlock, VideoBlock, PDFBlock
 from notion.block import TextBlock, CodeBlock, DividerBlock
 
 from notion.operations import build_operation
 from notion.markdown import markdown_to_notion
 
 import md2notion.upload as md2notion
+
+################################################################################
+moment_re = re.compile(r'dayone-moment:/(.*)?/([a-fA-F0-9]{32})')
+def moment_to_block(entry, block):
+    moment = block['source']
+    m = moment_re.match(moment)
+    if not m: return None
+
+    #TODO use named groups
+    moment_type = m.groups()[0]
+    moment_id = m.groups()[1]
+
+    if moment_type == '':
+        folder = 'photos'
+        section = entry['photos']
+        block['type'] = ImageBlock
+    elif moment_type == 'video':
+        folder = 'videos'
+        section = entry['videos']
+        block['type'] = VideoBlock
+    elif moment_type == 'pdfAttachment':
+        folder = 'pdfs'
+        section = entry['pdfAttachments']
+        block['type'] = PDFBlock
+    else:
+        return None
+
+    item = next(item for item in section if item['identifier'] == moment_id)
+    filename = f'{item["md5"]}.{item["type"]}'
+    block['source'] = os.path.join(folder, filename)
+
+    return block
 
 ################################################################################
 argp = argparse.ArgumentParser(description='mycomix')
@@ -79,7 +111,6 @@ for source_file in args.files:
         print(f'Adding entry: {title}')
 
         row = journal.add_row()
-
         row.title = title
         row.id = entry['uuid']
 
@@ -117,9 +148,12 @@ for source_file in args.files:
         if 'creationDevice' in entry:
             row.device = entry['creationDevice']
 
-        # TODO handle photos / videos / files
         blocks = md2notion.convert(body)
         for block in blocks:
+            if block['type'] is ImageBlock:
+                block = moment_to_block(entry, block)
+                if block is None: continue
+
             md2notion.uploadBlock(block, row, source_file)
 
         if args.raw:
