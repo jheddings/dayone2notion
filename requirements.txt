@@ -1,0 +1,4 @@
+notion==0.0.28
+commonmark==0.9.1
+md2notion==2.2.1
+mistletoe==0.7.2

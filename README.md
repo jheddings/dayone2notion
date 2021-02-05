@@ -4,23 +4,34 @@ Import content from Day One into Notion.
 
 ## Requirements
 
-This script uses the notion-py client library.  Install using pip:
+This script uses several helper libraries.  Install using `pip`:
 
 ```
-python3 -m pip install notion-py
+python3 -m pip install -r requirements.txt
 ```
+
+Advanced users may want to use `venv` to manage these dependencies.
 
 ## Usage
 
-First, open the `main.py` script and edit the configuration details for your Notion account.
+First, you'll need to export the content from Day One:
 
 1. Export a journal from Day One in JSON format.
 2. Unzip the archive.
-3. Pass the `.json` file to script, e.g.:
+
+Now, run the script, supplying your user token and top-level archive page:
 
 ```
-python3 main.py export/Journal.json
+dayone2notion.py --token TOKEN_V2 --page URL <json_file>
 ```
+
+It's possible to import multiple files at the same time.
+
+```
+dayone2notion.py --token TOKEN_V2 --page URL <json_file1> <json_file2> ...
+```
+
+Additionally, the `--raw` parameter will include a raw copy of the entry data in the import.
 
 ### Obtaining your user token
 
@@ -33,5 +44,4 @@ and is never in any way made visible to others.
 
 - The script is slow due to interactions with the Notion API server.
 - Photos and videos are not handled correctly.
-- Markup is not being handled correctly.
 
