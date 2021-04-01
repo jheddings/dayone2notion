@@ -134,8 +134,9 @@ for source_file in args.files:
 
         if 'userActivity' in entry:
             activity = entry['userActivity']
-            row.activity = activity['activityName']
-            if activity['stepCount'] > 0:
+            if 'activityName' in activity:
+                row.activity = activity['activityName']
+            if 'stepCount' in activity and activity['stepCount'] > 0:
                 row.step_count = activity['stepCount']
 
         if 'stepCount' in entry:
@@ -143,7 +144,8 @@ for source_file in args.files:
 
         if 'weather' in entry:
             wx = entry['weather']
-            row.weather = wx['conditionsDescription']
+            if 'conditionsDescription' in wx:
+                row.weather = wx['conditionsDescription']
 
         if 'creationDevice' in entry:
             row.device = entry['creationDevice']
