@@ -128,7 +128,7 @@ for source_file in args.files:
 
         if 'location' in entry:
             place = entry['location']
-            row.location = place['placeName']
+            row.location = place.get('placeName', '')
             row.longitude = place['longitude']
             row.latitude = place['latitude']
 
